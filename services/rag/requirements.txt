@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+langchain
+faiss-cpu
+openai
+pydantic
+requests
+google-genai
+chromadb
+python-dotenv

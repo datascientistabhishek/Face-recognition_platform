@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+numpy
+opencv-python
+opencv-contrib-python
+sqlmodel
+python-multipart
+pydantic
+Pillow
+scipy
+scikit-image
+requests
