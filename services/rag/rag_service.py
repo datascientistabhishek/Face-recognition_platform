@@ -5,7 +5,7 @@ import os
 import sqlite3
 import time
 import logging
-from google import genai
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 # Load .env file (if present) so GEMINI_API_KEY can be set in development
@@ -29,26 +29,10 @@ def generate_with_gemini(prompt: str, model: str = 'gemini-2.0-flash') -> str:
     if not key:
         raise EnvironmentError('GEMINI_API_KEY or GOOGLE_API_KEY not set')
     try:
-        client = genai.Client()
-        resp = client.models.generate_content(model=model, contents=prompt)
-        # response may expose `text` or `candidates` depending on client version
-        out = None
-        if hasattr(resp, 'text') and resp.text:
-            out = resp.text
-        elif hasattr(resp, 'candidates') and resp.candidates:
-            cand = resp.candidates[0]
-            out = getattr(cand, 'content', None) or str(cand)
-        else:
-            # fallback to raw dict
-            try:
-                j = resp.to_dict()
-                if 'candidates' in j and j['candidates']:
-                    out = j['candidates'][0].get('content')
-                else:
-                    out = j.get('content')
-            except Exception:
-                out = str(resp)
-        return out or ''
+        genai.configure(api_key=key)
+        model_obj = genai.GenerativeModel(model)
+        resp = model_obj.generate_content(prompt)
+        return resp.text if hasattr(resp, 'text') else str(resp)
     except Exception as e:
         logger.exception('Error calling Gemini: %s', e)
         return f'Error: {str(e)}'
