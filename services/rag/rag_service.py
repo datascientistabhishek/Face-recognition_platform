@@ -62,7 +62,7 @@ FACE_DB = os.path.abspath(os.path.join(BASE_DIR, '..', 'face_recog', 'db', 'face
 
 def fetch_people_from_db() -> List[dict]:
     """Read registration metadata directly from face_recog sqlite DB.
-    Returns list of dicts with keys: id, name, registered_at
+    Returns list of dicts with keys: id, name, registered_at, timestamp
     """
     if not os.path.exists(FACE_DB):
         logger.warning('Face DB not found at %s', FACE_DB)
@@ -74,7 +74,18 @@ def fetch_people_from_db() -> List[dict]:
         cur.execute("SELECT id, name, registered_at FROM person ORDER BY registered_at ASC")
         rows = cur.fetchall()
         conn.close()
-        return [{'id': r[0], 'name': r[1], 'registered_at': r[2]} for r in rows]
+        
+        from datetime import datetime
+        result = []
+        for r in rows:
+            timestamp_readable = datetime.fromtimestamp(r[2]).strftime('%Y-%m-%d %H:%M:%S')
+            result.append({
+                'id': r[0], 
+                'name': r[1], 
+                'registered_at': r[2],
+                'timestamp': timestamp_readable
+            })
+        return result
     except Exception as e:
         logger.error('Error reading DB: %s', e)
         return []
@@ -110,10 +121,10 @@ def query(req: QueryRequest):
     last_n = people[-10:]
     docs_text = []
     for p in reversed(last_n):
-        docs_text.append(f"ID: {p['id']} | Name: {p['name']} | RegisteredAt: {p['registered_at']}")
+        docs_text.append(f"ID: {p['id']} | Name: {p['name']} | Registered: {p['timestamp']}")
     joined = "\n".join(docs_text)
     
-    system_prompt = "You are a friendly, helpful assistant that answers questions about face registrations. Keep responses concise and personable."
+    system_prompt = "You are a friendly, helpful assistant that answers questions about face registrations. Include timestamps when asked about when people were registered. Keep responses concise and personable."
     prompt = f"{system_prompt}\n\nRegistration records:\n{joined}\n\nQuestion: {req.query}\n\nAnswer in a friendly way (one or two sentences)."
     
     try:
