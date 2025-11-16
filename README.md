@@ -1,5 +1,6 @@
 # Face Recognition Platform with Real-Time AI Q&A (RAG)
 
+Demo Vedio - https://drive.google.com/file/d/1v9ltgsT5CGbOVR1sZ9Ec8-ZizEiJBZXG/view?usp=drive_link
 This repository contains a scaffold for a browser-based face recognition platform with real-time recognition and a Retrieval-Augmented Generation (RAG) chat interface.
 
 Goal
