@@ -111,7 +111,9 @@ def register(req: RegisterRequest):
         except Exception:
             pass
 
-        return {'id': p.id, 'name': p.name}
+        from datetime import datetime
+        timestamp = datetime.fromtimestamp(p.registered_at).isoformat()
+        return {'id': p.id, 'name': p.name, 'registered_at': p.registered_at, 'timestamp': timestamp}
     except Exception as e:
         return {'error': str(e)}
 

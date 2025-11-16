@@ -38,7 +38,13 @@ export default function RegistrationTab(){
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, image: data })
     }).then(r=>r.json()).catch(e=>({error: e.message}));
-    setStatus(JSON.stringify(res));
+    
+    if (res.timestamp) {
+      const timeStr = new Date(res.timestamp).toLocaleString();
+      setStatus(`✅ ${res.name} registered at ${timeStr}`);
+    } else {
+      setStatus(JSON.stringify(res));
+    }
     await fetchRecent();
   }
 
@@ -57,6 +63,7 @@ export default function RegistrationTab(){
       <div className="small">Status: {status}</div>
       <div className="metaList">
         <div className="metaItem small">Last registered: {recent.name ? `${recent.name}` : 'none'}</div>
+        {recent.registered_at && <div className="metaItem small" style={{marginTop: '10px'}}>Time: {new Date(recent.registered_at * 1000).toLocaleString()}</div>}
       </div>
     </div>
   )
