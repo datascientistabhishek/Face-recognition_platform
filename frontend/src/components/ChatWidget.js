@@ -12,14 +12,15 @@ export default function ChatWidget(){
       try{
         const d = JSON.parse(ev.data);
         if(d.type === 'chat_response'){
-          // update the placeholder bot message if present
+          // Handle both payload and direct response structures
+          const answer = d.payload?.answer || d.answer || (d.error ? `Error: ${d.error}` : 'No response');
           setMessages(prev => {
             const last = prev[prev.length-1];
             if (last && last.from === 'bot' && last.text === '...'){
               // replace last
-              return [...prev.slice(0, -1), {from:'bot', text: d.payload.answer}];
+              return [...prev.slice(0, -1), {from:'bot', text: answer}];
             }
-            return [...prev, {from:'bot', text: d.payload.answer}];
+            return [...prev, {from:'bot', text: answer}];
           });
           setWaiting(false);
         }

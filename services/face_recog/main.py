@@ -193,3 +193,18 @@ def count():
     with Session(engine) as session:
         c = session.exec(select(Person)).all()
         return {'count': len(c)}
+
+@app.delete('/delete-all')
+def delete_all():
+    """Delete all registered persons from the database"""
+    try:
+        with Session(engine) as session:
+            session.query(Person).delete()
+            session.commit()
+        return {'status': 'success', 'message': 'All persons deleted'}
+    except Exception as e:
+        return {'status': 'error', 'message': str(e)}
+
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app, host='0.0.0.0', port=8001)
